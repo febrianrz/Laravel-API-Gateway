@@ -4,13 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use DataTables;
 use App\Models\Endpoint;
-use App\Altcore\Helpers\Select2;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\EndpointRequest;
-use App\Http\Resources\EndpointResource;
 use App\Altcore\Helpers\AltAuth;
+use App\Altcore\Helpers\Select2;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\EndpointRequest;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Resources\EndpointResource;
+use Illuminate\Support\Facades\Route;
 
 class EndpointController extends Controller
 {
@@ -61,13 +63,17 @@ class EndpointController extends Controller
         $endpoint = new Endpoint();
 
         $endpoint->fill(
-            $request->_form->data([
-                'name',
+            $request->only([
+              'path',
+              'name',
+              'description',
+              'url',
+              'is_active'
             ])
         );
 
         $endpoint->save();
-
+        Artisan::call('optimize');
         return [
             'message' => "Endpoint [{$endpoint->name}] berhasil dibuat",
             'data' => $endpoint,
@@ -101,13 +107,17 @@ class EndpointController extends Controller
         $name = $endpoint->name;
 
         $endpoint->fill(
-            $request->_form->data([
-                'name',
-            ])
+          $request->only([
+            'path',
+            'name',
+            'description',
+            'url',
+            'is_active'
+          ])
         );
 
         $endpoint->save();
-
+        Artisan::call('optimize');
         return [
             'message' => "Endpoint [{$name}] berhasil diubah",
             'data' => $endpoint,
@@ -123,12 +133,20 @@ class EndpointController extends Controller
     public function destroy(Endpoint $endpoint)
     {
         request()->_check->authorize($this->scope.'-destroy');
-        request()->_form->delete($endpoint);
+        // request()->_form->delete($endpoint);
         $endpoint->delete();
-
+        Artisan::call('optimize');
         return [
             'message' => "Endpoint [{$endpoint->name}] berhasil dihapus",
             'data' => $endpoint,
         ];
+    }
+
+    public function reset(Request $request)
+    {
+      Artisan::call('optimize');
+      return response()->json([
+        'message' => 'Berhasil mereload cache'
+      ]);
     }
 }

@@ -2,8 +2,8 @@
 
 return [
   'key' => [
-    'service_key'     => '7a010280-0f46-11eb-abb5-991e14fe1e7a',
-    'service_secret'  => 'XlodtdOlZWWZvyCLtlJ6b21vwiB9OBFu1DbCUkKZfOvLow54ofTbALuaNvuk'
+    'service_key'     => '',
+    'service_secret'  => ''
   ],
   'url' => [
     'auth'  => 'https://satuakun.id',
